@@ -1,0 +1,47 @@
+ruleset_id: "rk3588_alarm_rules_v2_candidate_presence"
+source_id: ""
+defaults:
+  confidence_threshold: 0.60
+  duration_frames: 3
+  cooldown_seconds: 10
+  pre_event_seconds: 1
+  post_event_seconds: 2
+  max_pending_events: 12
+  priority: "normal"
+rules:
+  - rule_id: "person_presence_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "person_presence"
+    enabled: true
+    class_filter: [person]
+    zone: null
+    confidence_threshold: 0.60
+    duration_frames: 3
+    min_object_count: 1
+    priority: "high"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"
+  - rule_id: "vehicle_presence_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "vehicle_presence"
+    enabled: true
+    class_filter: [car, bus, truck, motorcycle, bicycle]
+    zone: null
+    confidence_threshold: 0.60
+    duration_frames: 3
+    min_object_count: 1
+    priority: "normal"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"
+  - rule_id: "multi_object_scene_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "multi_object_scene"
+    enabled: true
+    class_filter: [person, car, bus, truck, motorcycle, bicycle]
+    zone: null
+    confidence_threshold: 0.55
+    duration_frames: 3
+    min_object_count: 2
+    priority: "normal"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"

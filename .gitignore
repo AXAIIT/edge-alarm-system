@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.eggs/
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build artifacts
+build/
+*.o
+*.obj
+*.exe
+*.out
+*.so
+*.dll
+*.lib
+*.a
+
+# Large media
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.webm
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+
+# Model files
+*.pt
+*.pth
+*.onnx
+*.engine
+*.trt
+*.rknn
+*.hbm
+*.bin
+*.gguf
+*.safetensors
+
+# Logs
+*.log
+logs/
+
+# Data directories
+data/
+runs/
+outputs/
+
+# Secrets
+.env
+*.env
+credentials.*
+secret.*
+run_meta.env
+
+# Runners (compiled binaries)
+runners/*/build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

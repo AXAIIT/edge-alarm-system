@@ -1,0 +1,57 @@
+model_combo_id: rk3588_8gb_alarm_combo_v1
+board: rk3588_8gb
+
+detector:
+  model_artifact_path: models/yolo11n/rknn/yolo11n_640_rk3588_rknnopt_int8_ptq_calib500.rknn
+  artifact_sha256: 40bce507d584498825267287cbb44c8dd860c8ddc3413677767891aeb225b69c
+  backend: rknn
+  precision: int8
+  project1_ref: projects/01_vision_deploy/reports/benchmark.md
+  project3_ref: projects/03_video_pipeline/reports/runtime_benchmark.md
+
+text_llm:
+  enabled: true
+  model: Qwen3-1.7B RKLLM W8A8
+  project4_admission_level: B_low_frequency
+  project4_selected_run_id: 20260701_rk3588_8gb_qwen3_1_7b_rkllm_text_ctx2048_formal_v2_plus_quality_v1_v2
+  runtime: RKLLM Runtime 1.3.0
+  context: 2048
+  max_output_tokens: 128
+  call_policy: async_event_triggered
+  timeout_ms: 30000
+  project4_baseline:
+    p50_total_ms: 15168.15
+    p95_total_ms: 26628.865
+    decode_tokens_per_s: 12.712
+    quality: composite_pass
+
+image_vlm:
+  enabled: true
+  model: Qwen3-VL-2B-Instruct RKNN vision 384 + RKLLM decoder W8A8
+  project4_admission_level: B_low_frequency
+  project4_selected_run_id: 20260703_rk3588_8gb_qwen3_vl_2b_rknn_rkllm_image_cn_formal_v2_max512
+  runtime: RKNN vision encoder + RKLLM decoder
+  call_policy: async_roi_only_low_frequency
+  max_events_per_minute: 1
+  timeout_ms: 70000
+  project4_baseline:
+    p50_total_ms: 21391.0
+    p95_total_ms: 57199.9
+    quality: pass_with_caveat
+
+video_vlm:
+  enabled: false
+  model: SmolVLM2-500M-Video-Instruct
+  project4_admission_level: D_not_used
+  project4_selected_run_id: none_for_project5_video
+  call_policy: disabled_by_project4_decision
+  replacement_strategy: detector_keyframe_roi_summary_then_text_llm
+  clip_seconds: 0
+  sampled_frames: 0
+  timeout_ms: 0
+
+fallback:
+  llm_timeout: template_fallback
+  vlm_timeout: skip_vlm
+  video_timeout: disabled_by_project4_decision
+  json_invalid: schema_repair

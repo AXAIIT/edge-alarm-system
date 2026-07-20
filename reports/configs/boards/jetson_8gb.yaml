@@ -1,0 +1,25 @@
+board: jetson_8gb
+environment_baseline_id: "20260609_jetson_8gb_env_baseline"
+input_source:
+  type: "video_file"  # camera | rtsp | video_file
+  uri: "projects/03_video_pipeline/configs/streams/video_fixed_v1.yaml"
+detector:
+  project3_pipeline_config: "projects/03_video_pipeline/configs/pipeline/jetson_tensorrt_pipeline.yaml"
+  backend: "tensorrt"
+  precision: "int8_ptq"
+  target_fps_min: 30
+queues:
+  event_queue_max: 16
+  drop_policy: "drop_low_priority"
+timeouts_ms:
+  vlm: 45000
+  video_understanding: 0
+  llm: 10000
+monitor:
+  interval_sec: 1
+  power_mode: "inherit_project3_project4_baseline_not_recorded"
+  save_dir: "logs/monitor/05_alarm_system/jetson_8gb/"
+stability:
+  smoke_minutes: 10
+  required_minutes: 30
+  target_minutes: 120

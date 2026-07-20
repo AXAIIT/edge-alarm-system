@@ -1,0 +1,90 @@
+required_fields:
+  - model_combo_id
+  - board
+  - detector
+  - text_llm
+  - image_vlm
+  - video_vlm
+  - fallback
+
+fields:
+  model_combo_id:
+    type: string
+  board:
+    type: string
+    allowed:
+      - jetson_8gb
+      - rk3588_8gb
+
+  detector:
+    required:
+      - model_artifact_path
+      - artifact_sha256
+      - backend
+      - precision
+      - project1_ref
+      - project3_ref
+    fields:
+      model_artifact_path: string
+      artifact_sha256: sha256_or_null
+      backend: string
+      precision: string
+      project1_ref: string
+      project3_ref: string
+
+  text_llm:
+    required:
+      - model
+      - project4_admission_level
+      - project4_selected_run_id
+      - runtime
+      - timeout_ms
+    fields:
+      model: string
+      project4_admission_level: A_mainline | B_low_frequency | C_offline | D_not_used | not_decided | not_executed | blocked
+      project4_selected_run_id: string_or_null
+      runtime: string_or_null
+      timeout_ms: integer
+    rules:
+      - when project4_admission_level is A_mainline or B_low_frequency, runtime must be non-null in selected combo.
+      - when project4_admission_level is not_decided, not_executed, or blocked, runtime may be null and the combo cannot enter formal capability conclusions.
+
+  image_vlm:
+    required:
+      - enabled
+      - project4_admission_level
+      - call_policy
+      - timeout_ms
+    fields:
+      enabled: boolean
+      project4_admission_level: A_mainline | B_low_frequency | C_offline | D_not_used | not_decided | not_executed | blocked
+      call_policy: online | low_frequency | async | async_roi_only_low_frequency | offline | disabled | disabled_by_project4_decision
+      timeout_ms: integer
+
+  video_vlm:
+    required:
+      - enabled
+      - project4_admission_level
+      - call_policy
+      - clip_seconds
+      - sampled_frames
+      - timeout_ms
+    fields:
+      enabled: boolean
+      project4_admission_level: A_mainline | B_low_frequency | C_offline | D_not_used | not_decided | not_executed | blocked
+      call_policy: online | low_frequency | async | offline | disabled | disabled_by_project4_decision
+      clip_seconds: number
+      sampled_frames: integer
+      timeout_ms: integer
+
+  fallback:
+    required:
+      - llm_timeout
+      - vlm_timeout
+      - video_timeout
+      - json_invalid
+    fields:
+      llm_timeout: template_fallback | failed
+      vlm_timeout: skip_vlm | failed
+      video_timeout: skip_video | disabled_by_project4_decision | failed
+      json_invalid: schema_repair | template_fallback | failed

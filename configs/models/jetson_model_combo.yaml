@@ -1,0 +1,64 @@
+model_combo_id: jetson_8gb_alarm_combo_v2_project4_selected
+board: jetson_8gb
+
+detector:
+  model_artifact_path: models/yolo11n/tensorrt/yolo11n_640_jetson_trt_int8_ptq_calib500_minmax_b8.engine
+  artifact_sha256: 1e966f10db6742476414294f931948b4732a4a44c07479022eca34869ab5ca9d
+  backend: tensorrt
+  precision: int8_ptq
+  project1_ref: projects/01_vision_deploy/reports/benchmark.md
+  project3_ref: projects/03_video_pipeline/reports/runtime_benchmark.md
+  project3_selected_runtime_run_id: 20260617_jetson_8gb_yolo11n_tensorrt_int8_runtime600_playlist20_noout
+  project3_selected_stability_run_id: 20260617_jetson_8gb_yolo11n_tensorrt_stability_acceptance_playlist80_noout
+
+text_llm:
+  enabled: true
+  model: Qwen3-1.7B GGUF Q4_K_M
+  project4_admission_level: B_low_frequency
+  project4_selected_run_id: 20260626_jetson_8gb_qwen3_1_7b_q4_k_m_gguf_llamacpp_cuda_text_ctx512_formal_v1
+  runtime: llama.cpp CUDA
+  context: 512
+  max_output_tokens: 128
+  call_policy: async_event_triggered
+  timeout_ms: 10000
+  project4_baseline:
+    p95_total_ms: 6370.1
+    decode_tokens_per_s: 29.345
+    memory_peak_mb: 2146
+    swap_used_mb: 218
+    temperature_max_c: 53.5
+
+image_vlm:
+  enabled: true
+  model: Qwen3-VL-2B-Instruct Q4_K_M GGUF + mmproj F16
+  project4_admission_level: B_low_frequency
+  project4_selected_run_id: 20260628_jetson_8gb_qwen3_vl_2b_q4_k_m_gguf_llamacpp_cuda_image_multi_input_formal_v2_mmproj_offload
+  runtime: llama.cpp CUDA mtmd/mmproj offload
+  call_policy: async_roi_only_low_frequency
+  max_events_per_minute: 2
+  image_tokens: 1024
+  timeout_ms: 45000
+  project4_baseline:
+    p50_total_ms: 24120.0
+    p95_total_ms: 33107.15
+    decode_tokens_per_s: 2.483
+    memory_peak_mb: 3777
+    swap_used_mb: 214
+    temperature_max_c: 64.5
+
+video_vlm:
+  enabled: false
+  model: SmolVLM2-500M-Video-Instruct
+  project4_admission_level: D_not_used
+  project4_selected_run_id: none_for_multiframe_video
+  call_policy: disabled_by_project4_decision
+  replacement_strategy: detector_keyframe_roi_summary_then_text_llm
+  clip_seconds: 0
+  sampled_frames: 0
+  timeout_ms: 0
+
+fallback:
+  llm_timeout: template_fallback
+  vlm_timeout: skip_vlm
+  video_timeout: disabled_by_project4_decision
+  json_invalid: schema_repair
