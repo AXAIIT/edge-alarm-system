@@ -716,22 +716,6 @@ LLM/VLM 输出只能补充解释，不能删除或改写原始检测事实。事
 | 检测被阻塞 | 队列隔离、丢弃低优先事件、限频 LLM/VLM | 队列长度、drop count、检测 FPS |
 | 摄像头断流 | 重连、切换固定视频、进入 degraded 状态 | 断流时间、恢复时间、丢帧数 |
 
-## 简历表达
-
-待项目数据完成后填写。必须包含真实 Jetson/RK3588、模型组合、端到端告警延迟、YOLO FPS、LLM tokens/s、VLM/视频理解调用耗时或降级原因、内存、温度、swap、稳定性结论和至少一个真实整合问题。
-
-## 面试问题
-
-待根据 `projects/05_alarm_system/reports/event_pipeline.md`、`alarm_system_benchmark.md`、`stability_report.md`、`failure_and_fallback.md` 和问题库积累。优先整理以下问题：
-
-- 为什么项目五必须先做项目四准入？
-- 如何保证 LLM/VLM 不阻塞 YOLO 高频检测？
-- 事件队列容量和丢弃策略怎么定？
-- 为什么 VLM 只传 ROI 或关键帧，不逐帧运行？
-- 告警 JSON 如何避免 LLM 幻觉覆盖检测事实？
-- 端到端告警延迟如何拆分？
-- 8GB 设备上如何处理 swap、温度和模型并行？
-- 摄像头断流和模型超时时怎么降级？
 ## 2026-07-13 工程增量
 
 这一轮不再新增新的目标板或新的模型路线，而是围绕现有 Project5 本地常驻服务做两件事：
