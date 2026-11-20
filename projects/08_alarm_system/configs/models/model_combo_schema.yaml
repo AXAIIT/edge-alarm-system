@@ -1,0 +1,146 @@
+required_fields:
+  - model_combo_id
+  - board
+  - model_spec_ref
+  - detector
+  - text_llm
+  - image_vlm
+  - video_vlm
+  - runtime_control
+  - concurrency_evaluation
+  - fallback
+
+validation_status_values:
+  - inherited_artifact_pending_project08_validation
+  - selected_pending_validation
+  - smoke_pass
+  - required_pass
+  - target_pass
+  - blocked
+  - disabled_by_project08_scope
+
+fields:
+  model_combo_id:
+    type: string
+  board:
+    type: string
+    allowed:
+      - jetson_8gb
+      - rk3588_8gb
+  model_spec_ref:
+    type: string
+
+  detector:
+    required:
+      - model_artifact_path
+      - artifact_sha256
+      - backend
+      - precision
+      - validation_status
+      - project1_ref
+      - project3_ref
+
+  text_llm:
+    optional:
+      - runtime_profile_ref
+      - prompt_policy
+      - runtime_strategy
+      - runtime_strategy_validation
+    required:
+      - enabled
+      - model
+      - model_artifact_path
+      - artifact_sha256
+      - validation_status
+      - runtime
+      - call_policy
+      - scheduler
+      - timeout_ms
+    rules:
+      - enabled formal execution requires non-null runtime.
+      - blocked status requires blocking_reason.
+      - real calls require route_target text_only, text_then_vlm, or a passed vlm_then_text dependency.
+      - each event revision and text purpose allows at most one real call.
+      - runtime_profile_ref is consumed only by the resident text LLM child process; it must not change the VLM or parent process library environment.
+      - stage2_final_r0_v2 uses the final natural-language prompt, read-only event risk/actions, raw-output quality gate and empty-detection rule bypass.
+
+  image_vlm:
+    optional:
+      - runtime_options
+      - prompt_policy
+      - runtime_profile_ref
+      - prompt_selection_status
+    required:
+      - enabled
+      - model
+      - validation_status
+      - runtime
+      - call_policy
+      - scheduler
+      - timeout_ms
+    rules:
+      - enabled formal execution requires frozen artifact paths and hashes.
+      - original_business_prompt_q_v1 retains the original build_prompt text; the referenced profile explicitly supplies Q sampling to the VLM request only. Owner selection does not imply complete semantic quality acceptance.
+      - p08_vlm_stage4_q6_vocab_runtime_v1 additionally pins the tested Q6_K vocabulary CPU library and its runtime artifacts. Its environment applies only to the resident VLM child. The original Q profile remains the rollback reference.
+      - p08_vlm_stage5_qkv_shared_runtime_v1 pins the stage 5 CPU library and enables QKV input preparation sharing in the resident VLM child. Its rollback reference is the stage 4 Q6 profile.
+      - p08_vlm_stage5_shared_prep_runtime_v1 enables both QKV and FFN gate/up preparation sharing with the same tested CPU library. Its first rollback restores QKV-only preparation sharing.
+      - p08_vlm_stage6_ffn_runtime_v1 keeps both preparation-sharing scopes and selects the tested FFN fusion library. Its rollback restores the stage 5 shared preparation profile.
+      - p08_vlm_stage6_mrope_runtime_v1 adds Q/K normalization and interleaved MRoPE fusion. Its rollback keeps FFN fusion.
+      - p08_vlm_stage6_residual_runtime_v1 adds residual ADD, RMSNorm and learned scaling fusion. Its rollback keeps FFN and MRoPE fusion.
+      - p08_vlm_stage7_q4_ffn_runtime_v1 adds the Q4_K FFN dot path. Its rollback keeps all three Stage 6 fusions.
+      - p08_vlm_stage8_gqa_runtime_v1 shares K/V loads for eligible CPU split-KV query head pairs. Its rollback keeps the Stage 7 Q4_K FFN path.
+      - p08_vlm_stage9_vision_sm72_mma_runtime_v1 selects a pinned VLM-only CUDA library and enables the SM72 vision D64 path. Its rollback is Stage 8.
+      - p08_vlm_stage10_vision_cast_runtime_v1 adds a pinned VLM-only preload for vision casts and bias. Its rollback is Stage 9.
+      - p08_vlm_stage13_vision_affine_coupled_runtime_v1 adds coupled vision residual, LayerNorm and affine execution. Its rollback is Stage 10.
+      - p08_vlm_stage16_language_cast_runtime_v1 adds C04 language Prefill conversion vectorization and residual fusion to Stage 13. Its rollback is Stage 13.
+      - p08_vlm_stage17_ffn_down_runtime_v1 adds the tested CPU Decode FFN down dot kernels to Stage 16. Its rollback is Stage 16.
+      - p08_vlm_stage19_projections_runtime_v1 enables five validated CPU Decode Attention projections. Its rollback is Stage 17.
+      - p08_vlm_stage19_kv64_runtime_v1 selects repaired KV64. Its rollback is Stage 19.
+      - p08_vlm_stage22_c03_vision_gemm_runtime_v1 adds the three validated visual cuBLAS groups. Its rollback is repaired KV64.
+      - p08_vlm_stage26_c03_language_gemm_runtime_v1 adds the validated image-embedding cuBLAS rules.
+      - p08_vlm_stage27_c06_prefetch_runtime_v1 adds language Prefill prefetch. Its rollback is Stage 26.
+      - an explicit vlm-temperature override that conflicts with a selected production sampling profile must fail before starting a model; remove the profile for an independently registered custom run.
+      - runtime_options defines VLM child-process placement; ngl=0 and no_kv_offload=true keep language layers and KV on CPU, while mmproj_offload=true permits the visual encoder/projector on CUDA0; startup logs must verify actual placement.
+      - object review real calls require object_roi, relation_context_crop, or full_keyframe.
+      - relationship review forbids a single object ROI and requires relation_context_crop or full_keyframe.
+      - temporal relation claims require at least three ordered keyframes and a temporal_contact_sheet_path for single-image runtimes.
+      - real calls require route_target vlm_only, text_then_vlm, or vlm_then_text and a selected alarm type.
+      - relationship review requires at least two detections.
+
+  video_vlm:
+    required:
+      - enabled
+      - validation_status
+      - call_policy
+      - clip_seconds
+      - sampled_frames
+      - timeout_ms
+
+  runtime_control:
+    required:
+      - resource_gate
+      - circuit_breaker
+      - degradation_order
+    rules:
+      - resource thresholds remain pending until Project 08 board-local validation.
+      - degradation order must preserve detector and rule alarm after pausing VLM and text real calls.
+
+  concurrency_evaluation:
+    required:
+      - common_topology_id
+      - three_model_same_window
+    rules:
+      - functional_pass records that detector, text and VLM can cooperate in one service topology.
+      - required_pass and target_pass still require board-local Project 08 evidence and stability windows.
+
+  fallback:
+    required:
+      - llm_timeout
+      - vlm_timeout
+      - video_timeout
+      - json_invalid
+    allowed:
+      llm_timeout: template_fallback | failed
+      vlm_timeout: skip_vlm | failed
+      video_timeout: skip_video | disabled_by_project08_scope | failed
+      json_invalid: schema_repair | template_fallback | failed

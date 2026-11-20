@@ -64,6 +64,10 @@ logs/
 data/
 runs/
 outputs/
+/models/
+/benchmark/raw/
+*.local.yaml
+*.local.json
 
 # Secrets
 .env

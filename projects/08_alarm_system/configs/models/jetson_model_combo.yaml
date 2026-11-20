@@ -1,0 +1,159 @@
+model_combo_id: jetson_8gb_alarm_combo_p08_v3_qwen3vl_q4_mmproj_q8_ctx1536_img768
+board: jetson_8gb
+model_spec_ref: projects/08_alarm_system/README.md
+
+detector:
+  model_artifact_path: models/yolo11n/tensorrt/yolo11n_640_jetson_trt_int8_ptq_calib500_minmax_b8.engine
+  artifact_sha256: 1e966f10db6742476414294f931948b4732a4a44c07479022eca34869ab5ca9d
+  backend: tensorrt
+  precision: int8_ptq
+  validation_status: current_project08_q8_triad_measured_detector_fps_below_30
+  dla_candidate_status: dla0_dla1_engines_loaded_q8_triad_below_30fps_raw_identity_correction_pending
+  dla_candidate_config_ref: projects/08_alarm_system/configs/detector/boards/jetson_8gb.yaml
+  dla_ownership_ref: projects/08_alarm_system/reports/scope_correction_20260928.md
+  project1_ref: projects/01_vision_deploy/reports/benchmark.md
+  project3_ref: projects/03_video_pipeline/reports/runtime_benchmark.md
+
+text_llm:
+  enabled: true
+  model: Qwen3-0.6B Q8_0 GGUF
+  model_artifact_path: models/llm_vlm/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf
+  artifact_sha256: 9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031
+  validation_status: standard_baseline_and_triad_v2_calls_pass_system_gate_not_verified
+  evidence_registration_status: standard_10warmup30_pass_project08_triad_v2_two_real_calls_pass_system_not_verified
+  runtime: llama.cpp CUDA
+  runtime_profile_ref: projects/08_alarm_system/configs/models/jetson_llm_stage6_scheme3_runtime.json
+  prompt_policy: stage2_final_r0_v2
+  runtime_strategy: stage6_scheme3_residual_norm_scale_plus_scheme2_QK_and_FFN_fusion_owner_selected_for_production_service
+  runtime_strategy_validation: default_scheme3_same_library_net_gain_observed_numeric_quality_and_worker_checks_passed
+  context: 512
+  max_output_tokens: 128
+  call_policy: resource_gated_async_event_triggered
+  scheduler:
+    max_in_flight: 1
+    queue_capacity: 32
+    per_event_max_real_calls: 1
+    minimum_interval_seconds: 25
+    request_deadline_seconds: 120
+    rate_limit_status: user_fixed_25s_observed_two_real_calls_and_cooldown_fallbacks_in_triad_v2
+    wake_route_targets: [text_only, text_then_vlm, vlm_then_text]
+    require_vlm_pass_for_vlm_then_text: true
+    periodic_summary_interval_seconds: 300
+    periodic_summary_min_events: 1
+    escalation_object_count_delta: 2
+    escalation_confidence_delta: 0.15
+  timeout_ms: 60000
+
+image_vlm:
+  enabled: true
+  prompt_policy: original_business_prompt_q_v1
+  runtime_profile_ref: projects/08_alarm_system/configs/models/jetson_vlm_stage27_c06_prefetch_runtime.json
+  prompt_selection_status: owner_selected_original_Q_quality_gaps_retained
+  model: Qwen3-VL-2B-Instruct Q4_K_M GGUF + mmproj Q8_0
+  model_artifact_path: models/llm_vlm/Qwen3-VL-2B-Instruct-GGUF/Qwen3VL-2B-Instruct-Q4_K_M.gguf
+  model_artifact_sha256: 089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae
+  mmproj_artifact_path: models/llm_vlm/Qwen3-VL-2B-Instruct-GGUF/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf
+  mmproj_artifact_sha256: f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82
+  artifact_source: Qwen/Qwen3-VL-2B-Instruct-GGUF
+  selection_status: selected
+  selection_decision_date: 2026-09-28
+  selection_decision_refs:
+    - projects/08_alarm_system/runs/20260925_jetson_8gb_project08_vlm_mmproj_q8_candidate_ab_v1/analysis/candidate_ab_results.md
+    - projects/08_alarm_system/runs/20260925_jetson_8gb_project08_vlm_mmproj_q8_candidate_ab_v1/run_final.md
+  validation_status: single_model_and_triad_v2_calls_pass_quality_and_system_gates_pending
+  evidence_registration_status: ctx1536_img768_single_model_10warmup30_pass_triad_v2_two_real_calls_pass_system_not_verified
+  runtime: llama.cpp CUDA mtmd/mmproj
+  runtime_options:
+    ngl: 0
+    device: auto
+    mmproj_offload: true
+    no_kv_offload: true
+    threads: 6
+    threads_batch: 6
+    placement: visual_encoder_mmproj_CUDA0_language_layers_and_KV_CPU
+  call_policy: resource_gated_task_driven_context_image
+  scheduler:
+    max_in_flight: 1
+    queue_capacity: 32
+    per_event_max_real_calls: 1
+    minimum_interval_seconds: 25
+    request_deadline_seconds: 360
+    rate_limit_status: user_fixed_25s_after_request_completion_observed_in_triad_v2
+    wake_alarm_types: [multi_object_scene, roi_object_review, visual_abnormal_review, device_panel_state_review]
+    wake_route_targets: [vlm_only, text_then_vlm, vlm_then_text]
+    minimum_relationship_object_count: 2
+    require_evidence_hash_change: true
+  input_policy:
+    object_review: object_roi
+    relationship_review: relation_context_crop
+    scene_review: full_keyframe
+    temporal_review: temporal_frames_required
+    relationship_fallback: full_keyframe
+    forbid_single_object_roi_for_relationship: true
+  context: 1536
+  image_tokens: 768
+  max_output_tokens: 160
+  timeout_ms: 300000
+
+runtime_control:
+  resource_gate:
+    status: enabled_ctx1536_img768_single_model_derived_triad_v2_gate_rejections_observed
+    threshold_basis_ref: projects/08_alarm_system/runs/20260928_jetson_8gb_project08_vlm_ctx1536_img768_triad_q8_v1/analysis/vlm_1536_img768_standard_baseline.md
+    threshold_basis_scope: single_model_resident_without_detector
+    observed_active_llm_available_ram_mb: 3834
+    observed_active_vlm_available_ram_mb: 2889
+    sample_before_each_model_call: true
+    fail_closed_on_missing_metrics: true
+    min_available_ram_mb: 2048
+    min_available_ram_mb_for_vlm: 2560
+    max_swap_used_mb: 512
+    max_swap_used_mb_for_vlm: 256
+    max_temperature_c: 70
+    max_event_queue_depth_for_text: 32
+    max_event_queue_depth_for_vlm: 32
+    detector_fps_floor: 27
+    detector_fps_gate_status: enabled_observed_triad_v2_below_30fps_27_456914
+    current_triad_run_ref: projects/08_alarm_system/runs/20260928_jetson_8gb_project08_vlm_ctx1536_img768_triad_q8_v2/analysis/tri_model_600s_results.md
+    current_triad_detector_fps: 27.456914
+    current_triad_preprocess_drop_count: 621
+    current_triad_reorder_timeout_skip_count: 750
+    current_triad_resource_gate_reject_count: 3
+  circuit_breaker:
+    failure_threshold: 2
+    initial_backoff_seconds: 25
+    max_backoff_seconds: 600
+    half_open_max_requests: 1
+  degradation_order:
+    - pause_vlm_real_calls
+    - pause_text_real_calls
+    - preserve_rule_alarm_and_detector
+
+concurrency_evaluation:
+  common_topology_id: dual_board_resident_three_model_v1
+  three_model_same_window:
+    status: not_verified
+    evidence_registration_status: pending_evidence_registration
+    required_status: required_window_completed_detector_fps_below_30_and_raw_identity_correction_pending
+    reason: triad_v2_607s_two_real_llm_and_vlm_calls_pass_but_fps_27_456914_with_621_preprocess_drops_750_reorder_skips_and_stale_detector_emitter_identity
+    test_matrix:
+      - detector_only
+      - detector_plus_text
+      - detector_plus_vlm
+      - detector_plus_text_plus_vlm
+    required_real_text_calls: 2
+    required_real_vlm_calls: 2
+
+video_vlm:
+  enabled: false
+  model: null
+  validation_status: disabled_by_project08_scope
+  call_policy: disabled
+  clip_seconds: 0
+  sampled_frames: 0
+  timeout_ms: 0
+
+fallback:
+  llm_timeout: template_fallback
+  vlm_timeout: skip_vlm
+  video_timeout: disabled_by_project08_scope
+  json_invalid: schema_repair

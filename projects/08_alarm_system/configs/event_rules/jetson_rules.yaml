@@ -1,0 +1,68 @@
+ruleset_id: "jetson_alarm_rules_v2_candidate_presence"
+source_id: ""
+defaults:
+  confidence_threshold: 0.60
+  duration_frames: 3
+  confirmation_window_seconds: 3
+  keyframe_sample_count: 3
+  min_positive_keyframes: 3
+  cooldown_seconds: 25
+  cooldown_start: "event_closed_or_last_seen"
+  event_key_policy: "source_rule_zone_track_or_scene_window"
+  active_event_policy: "merge_into_existing_event_id"
+  clear_after_frames: 30
+  context_padding_ratio: 0.25
+  escalation_policy: "append_revision_without_model_gate_bypass"
+  route_target: "rule_only"
+  pre_event_seconds: 1
+  post_event_seconds: 2
+  max_pending_events: 32
+  priority: "normal"
+rules:
+  - rule_id: "person_presence_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "person_presence"
+    enabled: true
+    class_filter: [person]
+    zone: null
+    confidence_threshold: 0.60
+    duration_frames: 3
+    min_object_count: 1
+    priority: "high"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"
+    vlm_input_mode: "object_roi"
+    route_target: "rule_only"
+    route_reason: "detector_presence_fact_and_rule_template_are_sufficient"
+  - rule_id: "vehicle_presence_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "vehicle_presence"
+    enabled: true
+    class_filter: [car, bus, truck, motorcycle, bicycle]
+    zone: null
+    confidence_threshold: 0.60
+    duration_frames: 3
+    min_object_count: 1
+    priority: "normal"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"
+    vlm_input_mode: "object_roi"
+    route_target: "rule_only"
+    route_reason: "detector_presence_fact_and_rule_template_are_sufficient"
+  - rule_id: "multi_object_scene_candidate"
+    alarm_domain: "visual_detection"
+    alarm_type: "multi_object_scene"
+    enabled: true
+    class_filter: [person, car, bus, truck, motorcycle, bicycle]
+    zone: null
+    confidence_threshold: 0.55
+    duration_frames: 3
+    min_object_count: 2
+    priority: "normal"
+    snapshot_policy: "best_confidence"
+    clip_policy: "pre_post"
+    vlm_input_mode: "relation_context_crop"
+    route_target: "text_then_vlm"
+    route_reason: "detector_fact_explanation_first_then_multi_object_visual_review"
+    vlm_purpose: "relationship_review"
+    text_purpose: "detector_fact_alarm_explanation"

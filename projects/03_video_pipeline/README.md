@@ -1,6 +1,6 @@
 # C++ 实时视频流推理 Pipeline / C++ Real-time Video Stream Inference Pipeline
 
-面向边缘 AI 设备的生产级 C++ 实时视频推理系统。支持 USB 摄像头、MIPI 摄像头、RTSP 流和视频文件输入，经 YOLO11n 目标检测，在 NVIDIA Jetson、Rockchip RK3588 和 Horizon RDK X5 三块边缘开发板上实现 30 FPS 持续推理，并通过 12 小时以上稳定性验证。
+这是[端侧实时视频推理与多模态告警系统](../../README.md)的视频检测模块。C++ 流水线支持 USB 摄像头、MIPI 摄像头、RTSP 和视频文件，在 Jetson、RK3588 和 RDK X5 的对应板端测试中达到约 30 FPS。Jetson 与 RDK X5 各有约 2 小时记录，RK3588 有相机 4 小时与视频 4 小时记录。[性能与稳定性口径](../../docs/benchmarks.md#c-实时视频检测)
 
 项目覆盖完整的工程化链路：多线程 pipeline 架构、有界队列与背压控制、分阶段延迟追踪、异常恢复与服务化部署，以及 MLPerf 风格 benchmark 报告。
 

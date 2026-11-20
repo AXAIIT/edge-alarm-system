@@ -1,0 +1,174 @@
+{
+  "schema_version": "1.0",
+  "profile_id": "p08_vlm_stage27_c06_prefetch_runtime_v1",
+  "prompt_policy": "original_business_prompt_q_v1",
+  "selection_status": "owner_selected_after_formal_trial",
+  "owner_instruction": "采纳这两个阶段，在报告开头说明。",
+  "selection_basis": "图前文本与图像求值联合预取，四轮首字均值快 93.613 ms，120 对回答一致。",
+  "prompt_implementation": "projects/08_alarm_system/scripts/run_demo/run_vlm_roi_qa.py::build_prompt",
+  "historical_prompt_source_sha256": "791de0257deb43c4782d3d36da22ee7ef034caff585ccc835540b3f8bc2e84c8",
+  "sampling": {
+    "temperature": 0.7,
+    "top_k": 20,
+    "top_p": 0.8,
+    "min_p": 0.0,
+    "top_n_sigma": -1.0,
+    "xtc_probability": 0.0,
+    "xtc_threshold": 0.10000000149011612,
+    "typical_p": 1.0,
+    "repeat_last_n": 64,
+    "repeat_penalty": 1.0,
+    "presence_penalty": 1.5,
+    "frequency_penalty": 0.0,
+    "dry_multiplier": 0.0,
+    "dry_base": 1.75,
+    "dry_allowed_length": 2,
+    "dry_penalty_last_n": -1,
+    "mirostat": 0,
+    "mirostat_tau": 5.0,
+    "mirostat_eta": 0.10000000149011612,
+    "dynatemp_range": 0.0,
+    "dynatemp_exponent": 1.0,
+    "ignore_eos": false,
+    "samplers": [
+      "penalties",
+      "dry",
+      "top_n_sigma",
+      "top_k",
+      "typ_p",
+      "top_p",
+      "min_p",
+      "xtc",
+      "temperature"
+    ]
+  },
+  "seed": 20261026,
+  "cache_prompt": true,
+  "source_registration": "projects/08_alarm_system/runs/20261026_jetson_8gb_project08_vlm_q2_positive_tasks_v1/inputs/registration.json",
+  "source_quality_recount": "projects/08_alarm_system/runs/20261026_project08_vlm_scoring_root_cause_audit_v1/analysis/development_recount_v2.json",
+  "quality_fully_accepted": false,
+  "new_prompt_tuning_authorized": false,
+  "frozen_route_record": "projects/08_alarm_system/configs/benchmark/vlm_prompt_optimization_freeze.json",
+  "adoption_record": "projects/08_alarm_system/runs/20261027_project08_vlm_q_production_adoption_v1/run.md",
+  "cache_ram_mib": 300,
+  "cache_budget_authorization": "负责人最新要求：设置为300MiB",
+  "historical_Q_extra_cache_ram_mib": 0,
+  "rollback_profile_ref": "projects/08_alarm_system/configs/models/jetson_vlm_stage26_c03_language_gemm_runtime.json",
+  "kernel_adoption_record": "projects/08_alarm_system/runs/20261110_jetson_8gb_project08_vlm_stage4_ttft_adoption_v1/run.md",
+  "cpu_kernel": {
+    "policy": "q6_vocab_neon",
+    "source_registration": "projects/08_alarm_system/runs/20261109_jetson_8gb_project08_vlm_stage4_q6_vocab_v1/inputs/registration.json",
+    "server_sha256": "b8377e9f8e242623ea28d9e1348e84fb2a4a70c2e13a70a885ceef41bcaff8f1",
+    "models_sha256": {
+      "language": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "mmproj": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82"
+    },
+    "library": {
+      "name": "libggml-cpu",
+      "path": "projects/08_alarm_system/runners/vlm/stage19_kv64_v1/libggml-cpu.so.0",
+      "sha256": "6fe6ec88f0446e49adac35a25f7c3ef8caf7d2a1d04222165949274db486dc71",
+      "source_registration": "projects/08_alarm_system/runs/20261119_jetson_8gb_project08_vlm_stage3_kv64_stage19_v3/experiment/inputs/registration.json"
+    },
+    "dependencies": [
+      {
+        "name": "libllama",
+        "path": "libllama.so.0.0.9777",
+        "sha256": "9658474ae1dac775c8d72c4ec6ac58e98459315d74d4f773312bb132691b9601"
+      },
+      {
+        "name": "libggml-cuda",
+        "path": "libggml-cuda.so.0.15.2",
+        "sha256": "f4bc96d5e9147de5e1530e6c2295e9821dbc55a9a43a236f8c83dc280d4239e3"
+      },
+      {
+        "name": "libmtmd",
+        "path": "libmtmd.so.0.0.9777",
+        "sha256": "e0f0ed0c8fb6c528392edababa1363db6ba3b042282fa6a9548d83a3bceef261"
+      }
+    ],
+    "shared_prep": "BOTH",
+    "shared_prep_source_registration": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage5_shared_prep_v2/experiment/inputs/registration.json",
+    "ffn_fusion": true,
+    "ffn_source_registration": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage6_ffn_stage5_retest_v1/experiment/inputs/registration.json",
+    "mrope_fusion": true,
+    "mrope_source_registration": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage6_mrope_v1/experiment/inputs/registration.json",
+    "residual_norm_fusion": true,
+    "residual_source_registration": "projects/08_alarm_system/runs/20261112_jetson_8gb_project08_vlm_stage6_residual_norm_v2/experiment/inputs/registration.json",
+    "q4_ffn_dot": true,
+    "q4_ffn_source_registration": "projects/08_alarm_system/runs/20261112_jetson_8gb_project08_vlm_stage7_q4k_ffn_v1/experiment/inputs/registration.json",
+    "gqa_pair": true,
+    "gqa_source_registration": "projects/08_alarm_system/runs/20261113_jetson_8gb_project08_vlm_stage8_gqa_v1/experiment/inputs/registration.json",
+    "vision_cuda": {
+      "path": "projects/08_alarm_system/runners/vlm/stage9_vision_sm72_mma_v1/libggml-cuda.so.0.15.2",
+      "sha256": "317076bfd022018bf525addb8be7018735d117eb7c5cccad352d757b14afd83e",
+      "source_registration": "projects/08_alarm_system/runs/20261113_jetson_8gb_project08_vlm_stage9_sm72_fattn_v1/experiment/inputs/registration.json"
+    },
+    "vision_cast": {
+      "name": "stage10_bias_v3",
+      "path": "projects/08_alarm_system/runners/vlm/stage10_vision_cast_v1/stage10_bias_v3.so",
+      "sha256": "63068c200336d25e5e988a0e5d1a73064c84d4f769ac4fffcc71013e26a4d1f2",
+      "source_registration": "projects/08_alarm_system/runs/20261115_jetson_8gb_project08_vlm_stage10_c04_v2/experiment/inputs/registration.json"
+    },
+    "vision_affine": [
+      {
+        "name": "affine",
+        "path": "projects/08_alarm_system/runners/vlm/stage13_affine_v1/affine.so",
+        "sha256": "d7a1bc80bb34aa842d1333023f99e849e96d410cfc6f32776240c8cba39417c0"
+      },
+      {
+        "name": "c13_fusion",
+        "path": "projects/08_alarm_system/runners/vlm/stage13_affine_v1/c13_fusion.so",
+        "sha256": "be2854c54aad7f04125ff42fd58958af79e41e6bdcc4533b29d9619ea7154dd4"
+      }
+    ],
+    "language_cast": {
+      "name": "language_fusion_v2",
+      "path": "projects/08_alarm_system/runners/vlm/stage16_language_cast_v1/language_fusion_v2.so",
+      "sha256": "8c96f7184be737bfd7ca4b1b2370b8604cbd6060226779501f30e3c0ef83fdd2",
+      "source_registration": "projects/08_alarm_system/runs/20261117_jetson_8gb_project08_vlm_stage16_c04_language_cast_v1/experiment/inputs/registration.json"
+    },
+    "decode_matrix": "down+q+k+v_q4+v_q6+attn_out",
+    "kv_alignment": 64,
+    "vision_gemm": {
+      "name": "vision_gemm_policy",
+      "path": "projects/08_alarm_system/runners/vlm/stage22_c03_v1/vision_gemm_policy.so",
+      "sha256": "47d4cba8f8bd2aa22a5b7d632165c71712726e5a187bca7aa9cb48c181347c2d",
+      "mask": 7,
+      "source_registration": "projects/08_alarm_system/runs/20261119_jetson_8gb_project08_vlm_stage22_c03_gpu_matrices_v1/experiment/inputs/registration.json"
+    },
+    "language_gemm": {
+      "preload": {
+        "name": "prefetch_scope",
+        "path": "projects/08_alarm_system/runners/vlm/stage27_c06_prefetch_v1/prefetch_scope.so",
+        "sha256": "c70f761a8cd17740cfb4faf801d78debb8172e35bf6cc10f1fd1f96f7c72f64c"
+      },
+      "policy": {
+        "name": "image_eval_gemm_policy",
+        "path": "projects/08_alarm_system/runners/vlm/stage26_c03_language_gemm_v1/image_only_policy.txt",
+        "sha256": "1fe313546e0b1fc38b1754e44879b8318445f55d5eb9eff70c86f9858b3b5c73"
+      }
+    },
+    "prefetch": {
+      "base": {
+        "name": "libggml-base",
+        "path": "projects/08_alarm_system/runners/vlm/stage27_c06_prefetch_v1/libggml-base.so.0.15.2",
+        "sha256": "8a4c1fe2d0167363eeb1f30a178c0fba0e5ed409396b02c902c3dd475f49bf69"
+      },
+      "mask": 3
+    }
+  },
+  "shared_prep_adoption_record": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage5_shared_prep_adoption_v1/run.md",
+  "ffn_adoption_record": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage6_ffn_adoption_v1/run.md",
+  "mrope_adoption_record": "projects/08_alarm_system/runs/20261111_jetson_8gb_project08_vlm_stage6_mrope_adoption_v1/run.md",
+  "residual_adoption_record": "projects/08_alarm_system/runs/20261112_jetson_8gb_project08_vlm_stage6_residual_adoption_v1/run.md",
+  "q4_ffn_adoption_record": "projects/08_alarm_system/runs/20261112_jetson_8gb_project08_vlm_stage7_q4k_adoption_v1/run.md",
+  "gqa_adoption_record": "projects/08_alarm_system/runs/20261113_jetson_8gb_project08_vlm_stage8_gqa_adoption_v1/run.md",
+  "vision_mma_adoption_record": "projects/08_alarm_system/runs/20261113_jetson_8gb_project08_vlm_stage9_sm72_adoption_v1/run.md",
+  "vision_cast_adoption_record": "projects/08_alarm_system/runs/20261116_jetson_8gb_project08_vlm_stage10_c04_adoption_v1/run.md",
+  "vision_affine_adoption_record": "projects/08_alarm_system/runs/20261116_jetson_8gb_project08_vlm_stage13_affine_adoption_v1/run.md",
+  "language_cast_adoption_record": "projects/08_alarm_system/runs/20261117_jetson_8gb_project08_vlm_stage16_c04_adoption_v1/analysis/board_adoption_complete.json",
+  "decode_matrix_adoption_record": "projects/08_alarm_system/runs/20261118_jetson_8gb_project08_vlm_stage17_c07_adoption_v1/analysis/board_adoption_complete.json",
+  "kv_alignment_adoption_record": "projects/08_alarm_system/runs/20261119_jetson_8gb_project08_vlm_kv64_adoption_v1/analysis/board_adoption_complete.json",
+  "c03_adoption_record": "projects/08_alarm_system/runs/20261119_jetson_8gb_project08_vlm_stage22_c03_adoption_v1/analysis/board_adoption_complete.json",
+  "language_adoption_record": "projects/08_alarm_system/runs/20261120_jetson_8gb_project08_vlm_stage27_adoption_v1/analysis/board_adoption_complete.json"
+}

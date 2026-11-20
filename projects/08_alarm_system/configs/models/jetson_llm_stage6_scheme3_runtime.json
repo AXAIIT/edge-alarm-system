@@ -1,0 +1,49 @@
+{
+  "profile_id": "p08_llm_stage6_scheme3",
+  "server_bin": "tools/llama.cpp/bin/llama-server",
+  "adoption_status": "adopted_as_default_production_runtime",
+  "selection_date": "2026-10-21",
+  "default_confirmation_date": "2026-10-22",
+  "production_service_switch_status": "selected_in_production_config",
+  "verification_status": "default_scheme3_same_library_net_gain_observed_numeric_quality_and_worker_checks_passed",
+  "policy": "Inherit Scheme2 Q/K norm+scale+RoPE, FFN B2, KV64/H12; add residual ADD+RMSNorm+learned scale fusion and combined residual/square-sum traversal; retain required residual output",
+  "context": 512,
+  "max_output_tokens": 128,
+  "temperature": 0.0,
+  "parallel": 1,
+  "ngl": 0,
+  "device": "none",
+  "no_kv_offload": true,
+  "jinja": true,
+  "threads": 6,
+  "threads_batch": 6,
+  "cpu_affinity": [0, 1, 2, 3, 4, 5],
+  "prompt_cache_ram_mib": 300,
+  "environment": {
+    "P08_LLM_KV_PAD": "64",
+    "P08_LLM_Q8_ROW_GROUP": "1",
+    "P08_LLM_Q8_SHAPE_MAP": "1024x151936:2",
+    "P08_LLM_SHARED_PREP": "off",
+    "P08_LLM_SHARED_PLAN": "lean",
+    "P08_LLM_FFN_FUSION": "b2",
+    "P08_LLM_NORM_ROPE": "scheduled",
+    "P08_LLM_RESIDUAL_NORM": "sum"
+  },
+  "server_sha256": "b8377e9f8e242623ea28d9e1348e84fb2a4a70c2e13a70a885ceef41bcaff8f1",
+  "model_sha256": "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
+  "libraries": [
+    {
+      "name": "libllama",
+      "path": "projects/08_alarm_system/runners/llm/stage6_scheme3_v1/libllama.so.0",
+      "sha256": "ca008c5b682f2f7fbdcd3d8f0315eebfcd437f36ed01b793970f42024163ab9f"
+    },
+    {
+      "name": "libggml-cpu",
+      "path": "projects/08_alarm_system/runners/llm/stage6_scheme3_v1/libggml-cpu.so.0",
+      "sha256": "24338e06ae161976edf0fffaa72437b50c533c985d6bc7f327d51d26d1edf619"
+    }
+  ],
+  "evidence_ref": "projects/08_alarm_system/runs/20261021_jetson_8gb_project08_llm_stage6_residual_norm_reboot_ab_v2/analysis/performance_analysis.json",
+  "adoption_evidence_ref": "projects/08_alarm_system/runs/20261021_jetson_8gb_project08_llm_stage6_scheme3_adoption_v1/",
+  "rollback_profile_ref": "projects/08_alarm_system/configs/models/jetson_llm_stage6_scheme2_runtime.json"
+}

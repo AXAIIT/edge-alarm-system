@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "alarm_event_schema.json",
+  "title": "Project 08 Structured Alarm JSON",
+  "type": "object",
+  "description": "Project 08 alarm JSON. Detection facts come from the event package; LLM/VLM add explanation without overwriting detections.",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "timestamp",
+    "schema_version",
+    "board",
+    "target",
+    "alarm_domain",
+    "alarm_type",
+    "event_stage",
+    "camera_id",
+    "source_frame",
+    "detections",
+    "roi_paths",
+    "video_clip_path",
+    "vlm_summary",
+    "video_summary",
+    "llm_explanation",
+    "risk_level",
+    "recommended_action",
+    "system_metrics",
+    "model_versions",
+    "project08_model_refs",
+    "route_target",
+    "route_reason",
+    "route_decision",
+    "fallback_status",
+    "evidence",
+    "json_fact_conflict"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "event_key": {"type": ["string", "null"]},
+    "alarm_revision": {"type": "integer", "minimum": 0},
+    "timestamp": {"type": "string"},
+    "schema_version": {"type": "integer", "const": 1},
+    "board": {"type": "string"},
+    "target": {"type": "string", "enum": ["jetson_8gb", "rk3588_8gb", "pc"]},
+    "alarm_domain": {
+      "type": "string",
+      "enum": [
+        "visual_detection",
+        "visual_evidence",
+        "text_explanation",
+        "system_runtime",
+        "model_runtime",
+        "json_quality",
+        "video_fallback"
+      ]
+    },
+    "alarm_type": {
+      "type": "string",
+      "enum": [
+        "person_presence",
+        "vehicle_presence",
+        "multi_object_scene",
+        "roi_object_review",
+        "visual_abnormal_review",
+        "device_panel_state_review",
+        "detection_json_summary",
+        "alarm_reasoning",
+        "alarm_json_generation",
+        "pipeline_runtime_fault",
+        "model_runtime_fault",
+        "json_fact_conflict",
+        "video_summary_disabled",
+        "generic_object_event"
+      ]
+    },
+    "event_stage": {"type": "string", "enum": ["candidate", "verified", "rejected", "fallback"]},
+    "event_state": {"type": "string", "enum": ["IDLE", "ACCUMULATING", "ACTIVE", "PUBLISHED", "ENRICHING", "VERIFIED", "REJECTED", "FALLBACK", "COOLDOWN"]},
+    "camera_id": {"type": "string"},
+    "source_frame": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["frame_id", "timestamp", "path"],
+      "properties": {
+        "frame_id": {"type": ["integer", "string"]},
+        "timestamp": {"type": "string"},
+        "path": {"type": ["string", "null"]}
+      }
+    },
+    "detections": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/detection"}
+    },
+    "roi_paths": {"type": "array", "items": {"type": "string"}},
+    "video_clip_path": {"type": ["string", "null"]},
+    "vlm_summary": {"type": ["string", "null"]},
+    "video_summary": {"type": ["string", "null"]},
+    "llm_explanation": {"type": ["string", "null"]},
+    "risk_level": {"type": "string", "enum": ["info", "low", "medium", "high", "critical"]},
+    "recommended_action": {"type": "string", "enum": ["observe", "notify_operator", "inspect_site", "stop_equipment", "escalate", "template_fallback", "no_action"]},
+    "system_metrics": {"type": "object", "additionalProperties": true},
+    "model_versions": {"type": "object", "additionalProperties": true},
+    "project08_model_refs": {"type": "array", "items": {"type": "string"}},
+    "route_target": {"type": ["string", "null"], "enum": ["rule_only", "template_only", "text_only", "vlm_only", "text_then_vlm", "vlm_then_text", null]},
+    "route_reason": {"type": ["string", "null"]},
+    "route_decision": {"type": "object", "additionalProperties": true},
+    "fallback_status": {"$ref": "#/$defs/fallback_status"},
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["event_package_path", "raw_result_path", "runtime_log_path", "monitor_log_path"],
+      "properties": {
+        "event_package_path": {"type": ["string", "null"]},
+        "raw_result_path": {"type": ["string", "null"]},
+        "runtime_log_path": {"type": ["string", "null"]},
+        "monitor_log_path": {"type": ["string", "null"]},
+        "failure_log_path": {"type": ["string", "null"]},
+        "project08_model_spec": {"type": ["string", "null"]}
+      }
+    },
+    "json_fact_conflict": {"type": "boolean"},
+    "fact_conflict_detail": {"type": ["string", "null"]}
+  },
+  "$defs": {
+    "detection": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["detection_id", "class_id", "confidence", "bbox", "source"],
+      "properties": {
+        "detection_id": {"type": ["string", "integer"]},
+        "class_id": {"type": ["integer", "string"]},
+        "class_name": {"type": ["string", "null"]},
+        "confidence": {"type": "number"},
+        "bbox": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number"}
+        },
+        "source": {"type": "string", "const": "event_package"}
+      }
+    },
+    "fallback_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detector", "event_trigger", "vlm", "video", "llm", "alarm_json"],
+      "properties": {
+        "detector": {"type": "string", "enum": ["ok", "failed", "fallback", "not_executed"]},
+        "event_trigger": {"type": "string", "enum": ["ok", "failed", "fallback", "not_executed"]},
+        "vlm": {"type": "string", "enum": ["ok", "timeout", "disabled_by_project08_scope", "not_executed", "failed"]},
+        "video": {"type": "string", "enum": ["ok", "timeout", "disabled_by_project08_scope", "not_executed", "failed"]},
+        "llm": {"type": "string", "enum": ["ok", "timeout", "template_fallback", "failed", "not_executed"]},
+        "alarm_json": {"type": "string", "enum": ["ok", "schema_repaired", "fact_conflict_detected", "failed", "not_executed"]}
+      }
+    }
+  }
+}

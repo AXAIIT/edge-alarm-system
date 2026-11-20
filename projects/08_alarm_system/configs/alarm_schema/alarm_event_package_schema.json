@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "alarm_event_package_schema.json",
+  "title": "Project 08 Alarm Event Package",
+  "type": "object",
+  "description": "Event package is the central evidence object for Project 08. Detections remain original detector facts; task-driven visual assets provide object, relation, scene, or temporal context.",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "run_id",
+    "board",
+    "target",
+    "source_id",
+    "camera_id",
+    "frame_id",
+    "timestamp",
+    "alarm_domain",
+    "alarm_type",
+    "event_stage",
+    "alarm_revision",
+    "trigger_rule_id",
+    "trigger_reason",
+    "detections",
+    "keyframe_path",
+    "roi_paths",
+    "roi_boxes",
+    "route_target",
+    "route_reason",
+    "needs_text",
+    "needs_vlm",
+    "text_purpose",
+    "vlm_purpose",
+    "evidence_hash",
+    "video_clip_path",
+    "pre_event_seconds",
+    "post_event_seconds",
+    "queue_depth_at_trigger",
+    "detector_latency_ms",
+    "event_trigger_latency_ms",
+    "roi_crop_latency_ms",
+    "video_clip_latency_ms",
+    "queue_metrics",
+    "status",
+    "log_paths"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string"},
+    "board": {"type": "string"},
+    "target": {"type": "string", "enum": ["jetson_8gb", "rk3588_8gb", "pc"]},
+    "source_id": {"type": "string"},
+    "camera_id": {"type": "string"},
+    "frame_id": {"type": ["string", "integer"]},
+    "timestamp": {"type": "string"},
+    "alarm_domain": {
+      "type": "string",
+      "enum": [
+        "visual_detection",
+        "visual_evidence",
+        "text_explanation",
+        "system_runtime",
+        "model_runtime",
+        "json_quality",
+        "video_fallback"
+      ]
+    },
+    "alarm_type": {
+      "type": "string",
+      "enum": [
+        "person_presence",
+        "vehicle_presence",
+        "multi_object_scene",
+        "roi_object_review",
+        "visual_abnormal_review",
+        "device_panel_state_review",
+        "detection_json_summary",
+        "alarm_reasoning",
+        "alarm_json_generation",
+        "pipeline_runtime_fault",
+        "model_runtime_fault",
+        "json_fact_conflict",
+        "video_summary_disabled",
+        "generic_object_event"
+      ]
+    },
+    "event_stage": {"type": "string", "enum": ["candidate", "verified", "rejected"]},
+    "alarm_revision": {"type": "integer", "minimum": 0},
+    "trigger_rule_id": {"type": "string"},
+    "trigger_reason": {"type": "string"},
+    "risk_level": {"type": "string", "enum": ["info", "low", "medium", "high", "critical"]},
+    "risk_basis": {"type": "string"},
+    "allowed_actions": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"type": "string", "enum": ["observe", "notify_operator", "inspect_site", "no_action"]}
+    },
+    "text_policy_version": {"type": "string", "enum": ["stage2_final_r0_v2"]},
+    "detections": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/detection"}
+    },
+    "keyframe_path": {"type": ["string", "null"]},
+    "keyframe_paths": {"type": "array", "items": {"type": "string"}},
+    "roi_paths": {"type": "array", "items": {"type": "string"}},
+    "roi_boxes": {"type": "array", "items": {"$ref": "#/$defs/roi_box"}},
+    "context_crop_path": {"type": ["string", "null"]},
+    "context_crop_box": {
+      "type": ["array", "null"],
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {"type": "number"}
+    },
+    "context_detection_ids": {"type": "array", "items": {"type": ["string", "integer"]}},
+    "context_padding_ratio": {"type": ["number", "null"], "minimum": 0},
+    "temporal_contact_sheet_path": {"type": ["string", "null"]},
+    "vlm_input_mode": {
+      "type": "string",
+      "enum": ["object_roi", "relation_context_crop", "full_keyframe", "temporal_frames"]
+    },
+    "evidence_frame_ids": {"type": "array", "items": {"type": ["string", "integer"]}},
+    "evidence_timestamps": {"type": "array", "items": {"type": ["string", "null"]}},
+    "confirmation_window_seconds": {"type": ["number", "null"], "minimum": 0},
+    "keyframe_sample_count": {"type": ["integer", "null"], "minimum": 1},
+    "min_positive_keyframes": {"type": ["integer", "null"], "minimum": 1},
+    "route_target": {
+      "type": "string",
+      "enum": ["rule_only", "template_only", "text_only", "vlm_only", "text_then_vlm", "vlm_then_text"]
+    },
+    "route_reason": {"type": ["string", "null"]},
+    "needs_text": {"type": "boolean"},
+    "needs_vlm": {"type": "boolean"},
+    "text_purpose": {"type": ["string", "null"]},
+    "vlm_purpose": {"type": ["string", "null"]},
+    "evidence_hash": {"type": ["string", "null"]},
+    "route_decision": {"type": "object", "additionalProperties": true},
+    "video_clip_path": {"type": ["string", "null"]},
+    "pre_event_seconds": {"type": ["number", "null"]},
+    "post_event_seconds": {"type": ["number", "null"]},
+    "queue_depth_at_trigger": {"type": ["integer", "null"]},
+    "detector_latency_ms": {"type": ["number", "null"]},
+    "event_trigger_latency_ms": {"type": ["number", "null"]},
+    "roi_crop_latency_ms": {"type": ["number", "null"]},
+    "video_clip_latency_ms": {"type": ["number", "null"]},
+    "queue_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enqueue_ts",
+        "dequeue_ts",
+        "wait_ms",
+        "drop_policy",
+        "drop_reason",
+        "priority"
+      ],
+      "properties": {
+        "enqueue_ts": {"type": ["string", "null"]},
+        "dequeue_ts": {"type": ["string", "null"]},
+        "wait_ms": {"type": ["number", "null"]},
+        "drop_policy": {"type": ["string", "null"], "enum": ["drop_low_priority", "drop_duplicate", "drop_oldest", "block_new", "none", null]},
+        "drop_reason": {"type": ["string", "null"]},
+        "priority": {"type": ["string", "null"], "enum": ["low", "normal", "high", "critical", null]}
+      }
+    },
+    "resource_gate": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "status": {"type": "string", "enum": ["pass", "fail", "degraded", "blocked", "not_verified"]},
+    "log_paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "runtime_log_path": {"type": ["string", "null"]},
+        "failure_log_path": {"type": ["string", "null"]},
+        "detector_log_path": {"type": ["string", "null"]}
+      }
+    }
+  },
+  "$defs": {
+    "detection": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["detection_id", "class_id", "confidence", "bbox"],
+      "properties": {
+        "detection_id": {"type": ["string", "integer"]},
+        "class_id": {"type": ["string", "integer"]},
+        "class_name": {"type": ["string", "null"]},
+        "confidence": {"type": "number"},
+        "bbox": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number"}
+        }
+      }
+    },
+    "roi_box": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["detection_id", "bbox_xyxy", "coordinate_space", "padding", "resized_to"],
+      "properties": {
+        "detection_id": {"type": ["string", "integer"]},
+        "bbox_xyxy": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "number"}
+        },
+        "coordinate_space": {"type": "string", "enum": ["source_frame"]},
+        "padding": {"type": ["number", "null"]},
+        "resized_to": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

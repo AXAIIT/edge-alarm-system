@@ -1,0 +1,124 @@
+model_combo_id: rk3588_8gb_alarm_combo_p08_v1
+board: rk3588_8gb
+model_spec_ref: projects/08_alarm_system/README.md
+
+detector:
+  model_artifact_path: models/yolo11n/rknn/yolo11n_640_rk3588_rknnopt_int8_ptq_calib500.rknn
+  artifact_sha256: 40bce507d584498825267287cbb44c8dd860c8ddc3413677767891aeb225b69c
+  backend: rknn
+  precision: int8
+  validation_status: inherited_artifact_pending_project08_validation
+  project1_ref: projects/01_vision_deploy/reports/benchmark.md
+  project3_ref: projects/03_video_pipeline/reports/runtime_benchmark.md
+
+text_llm:
+  enabled: true
+  model: Qwen3-0.6B Q8_0 GGUF
+  model_artifact_path: models/llm_vlm/Qwen3-0.6B-GGUF/Qwen3-0.6B-Q8_0.gguf
+  artifact_sha256: 9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031
+  validation_status: smoke_pass
+  evidence_registration_status: pending_evidence_registration
+  runtime: board_local_runtime
+  runtime_identity_status: pending_evidence_registration
+  context: 512
+  max_output_tokens: 128
+  call_policy: resource_gated_async_event_triggered_after_runtime_validation
+  scheduler:
+    max_in_flight: 1
+    queue_capacity: 32
+    per_event_max_real_calls: 1
+    minimum_interval_seconds: 25
+    request_deadline_seconds: 120
+    rate_limit_status: user_fixed_25s_pending_board_validation
+    wake_route_targets: [text_only, vlm_then_text]
+    require_vlm_pass_for_vlm_then_text: true
+    periodic_summary_interval_seconds: 300
+    periodic_summary_min_events: 1
+    escalation_object_count_delta: 2
+    escalation_confidence_delta: 0.15
+  timeout_ms: 30000
+
+image_vlm:
+  enabled: true
+  model: Qwen3-VL-2B-Instruct RKNN vision 384 + RKLLM decoder W8A8
+  vision_artifact_path: models/llm_vlm/Qwen3-VL-2B-RKNN/qwen3-vl_vision_384_patch_embed_cpu_rk3588.rknn
+  vision_artifact_sha256: 2b0563c433c64d80f21ee79ecf8184519b7d14811f768971baf25673cb380e9a
+  decoder_artifact_path: models/llm_vlm/Qwen3-VL-2B-RKLLM/qwen3-vl-2b-instruct_w8a8_rk3588.rkllm
+  decoder_artifact_sha256: c3473f817ad4c36817f91b9ce55c1df670687e36c10379f3bf73c2f332b24c93
+  validation_status: smoke_pass
+  evidence_registration_status: pending_evidence_registration
+  runtime: RKNN vision encoder + RKLLM decoder
+  call_policy: resource_gated_task_driven_context_image
+  scheduler:
+    max_in_flight: 1
+    queue_capacity: 32
+    per_event_max_real_calls: 1
+    minimum_interval_seconds: 25
+    request_deadline_seconds: 180
+    rate_limit_status: user_fixed_25s_after_request_completion_pending_board_validation
+    wake_alarm_types: [multi_object_scene, roi_object_review, visual_abnormal_review, device_panel_state_review]
+    wake_route_targets: [vlm_only, vlm_then_text]
+    minimum_relationship_object_count: 2
+    require_evidence_hash_change: true
+  input_policy:
+    object_review: object_roi
+    relationship_review: relation_context_crop
+    scene_review: full_keyframe
+    temporal_review: temporal_frames_required
+    relationship_fallback: full_keyframe
+    forbid_single_object_roi_for_relationship: true
+  timeout_ms: 70000
+
+runtime_control:
+  resource_gate:
+    status: enabled_initial_safety_thresholds_pending_7x24_validation
+    sample_before_each_model_call: true
+    fail_closed_on_missing_metrics: true
+    min_available_ram_mb: 768
+    min_available_ram_mb_for_vlm: 1024
+    max_swap_used_mb: 1024
+    max_swap_used_mb_for_vlm: 768
+    max_temperature_c: 75
+    max_event_queue_depth_for_text: 32
+    max_event_queue_depth_for_vlm: 32
+    detector_fps_floor: 27
+    detector_fps_gate_status: enabled_service_window_estimate
+  circuit_breaker:
+    failure_threshold: 2
+    initial_backoff_seconds: 25
+    max_backoff_seconds: 600
+    half_open_max_requests: 1
+  degradation_order:
+    - pause_vlm_real_calls
+    - pause_text_real_calls
+    - preserve_rule_alarm_and_detector
+
+concurrency_evaluation:
+  common_topology_id: dual_board_resident_three_model_v1
+  three_model_same_window:
+    status: functional_pass
+    evidence_registration_status: pending_evidence_registration
+    required_status: pending_project08_required_run
+    reason: rk3588_three_model_collaboration_confirmed
+    test_matrix:
+      - detector_only
+      - detector_plus_text
+      - detector_plus_vlm
+      - detector_plus_text_plus_vlm
+    required_real_text_calls: 2
+    required_real_vlm_calls: 2
+
+video_vlm:
+  enabled: false
+  model: null
+  validation_status: disabled_by_project08_scope
+  call_policy: disabled
+  clip_seconds: 0
+  sampled_frames: 0
+  timeout_ms: 0
+
+fallback:
+  llm_timeout: template_fallback
+  vlm_timeout: skip_vlm
+  video_timeout: disabled_by_project08_scope
+  json_invalid: schema_repair
